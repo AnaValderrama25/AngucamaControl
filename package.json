@@ -1,0 +1,25 @@
+{
+  "name": "angucamacontrol",
+  "version": "1.0.0",
+  "description": "Angucama Control App",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AnaValderrama25/AngucamaControl.git"
+  },
+  "author": "Ana Valderrama",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AnaValderrama25/AngucamaControl/issues"
+  },
+  "homepage": "https://github.com/AnaValderrama25/AngucamaControl#readme",
+  "devDependencies": {
+    "electron": "^3.0.10"
+  },
+  "dependencies": {
+    "mqtt": "^2.18.8"
+  }
+}
