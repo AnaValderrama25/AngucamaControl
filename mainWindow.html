@@ -1,11 +1,28 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8" />
+
+    <script src="https://www.gstatic.com/firebasejs/5.6.0/firebase.js"></script>
+    <script>
+        // Initialize Firebase
+        var config = {
+            apiKey: "AIzaSyDOoarSc7bVJkueM-r7YqUIenXtP91TBc0",
+            authDomain: "angucama-control.firebaseapp.com",
+            databaseURL: "https://angucama-control.firebaseio.com",
+            projectId: "angucama-control",
+            storageBucket: "angucama-control.appspot.com",
+            messagingSenderId: "585913087447"
+        };
+        firebase.initializeApp(config);
+    </script>
     <script src="./mainWindow.js"></script>
     <title>Angucama</title>
 </head>
+
 <body>
-    <h1>Angucama</h1>  
+    <h1>Angucama</h1>
 </body>
+
 </html>
