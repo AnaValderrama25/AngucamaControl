@@ -16,16 +16,13 @@ var beds = {
     "good_position": "false"
   }
 }
-//console.log(beds["1A"].good_position);
-//console.log('changing good pos to false');
-//beds["1A"].good_position = false;
-//console.log(beds["1A"].good_position);
 
 //Declaring MQTT nedeed variables
 var mqtt = require('mqtt')
 var client = mqtt.connect('ws://192.168.0.6:9001')
 console.log(client);
 
+//Declaring firebase database service
 var database = firebase.database();
 
 // Call MQTT methods
@@ -54,8 +51,9 @@ function mqtt_handle() {
     var h = addZero(d.getHours());
     var m = addZero(d.getMinutes());
     var s = addZero(d.getSeconds());
-
-    function addZero(i) {
+    
+    
+    function addZero(i) { //Function to add a good format in current_time variable
       if (i < 10) {
         i = "0" + i;
       }
@@ -63,12 +61,9 @@ function mqtt_handle() {
     }
 
     var current_time = h + ':' + m + ':' + s;
-    // console.log('Hasta aquí '  + current_time);
-
-
+  
     var key_id = id_message + '-' + current_time;
-    //console.log('Esta es la key: ' + key_id);
-
+    
 
     if (position_message != beds[id_message].good_position) {
       beds[id_message].good_position = position_message;
@@ -79,7 +74,7 @@ function mqtt_handle() {
       console.log(current_time);
     }
 
-    //client.end()
+    //client.end() -> This disconnect the client not allowing it to receive messagges
   })
 }
 
