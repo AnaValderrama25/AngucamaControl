@@ -19,7 +19,7 @@ var beds = {
 
 //Declaring MQTT nedeed variables
 var mqtt = require('mqtt')
-var client = mqtt.connect('ws://192.168.0.6:9001')
+var client = mqtt.connect('ws://10.103.53.43:9001')
 console.log(client);
 
 //Declaring firebase database service
