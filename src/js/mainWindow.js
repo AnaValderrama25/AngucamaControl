@@ -1,7 +1,24 @@
 const electron = require('electron');
+const { remote, ipcRenderer} = electron;
+var mqtt = require('mqtt');
+var ipBroker = '192.168.0.7';
+var client = '';
 
-// Creating beds array  
+// Initialize Firebase
+var config = {
+  apiKey: "AIzaSyBy_bPl1gTzp4QDtQajTi4KFzpF5nwZDyE",
+  authDomain: "angucama-control-2ec5a.firebaseapp.com",
+  databaseURL: "https://angucama-control-2ec5a.firebaseio.com",
+  projectId: "angucama-control-2ec5a",
+  storageBucket: "angucama-control-2ec5a.appspot.com",
+  messagingSenderId: "827582107892"
+};
+firebase.initializeApp(config);
 
+//Declaring firebase database service
+var database = firebase.database();
+
+// Creating beds arrays
 var beds = {
   "1A": {
     "id": "1A",
@@ -17,30 +34,29 @@ var beds = {
   }
 }
 
-//Declaring MQTT nedeed variables
-var mqtt = require('mqtt')
-var client = mqtt.connect('ws://10.103.53.43:9001')
-console.log(client);
-
-//Declaring firebase database service
-var database = firebase.database();
-
-// Call MQTT methods
+// Starting MQTT
 mqtt_init();
-mqtt_handle();
+mqtt_handler();
 
-//Method to subscribe to a topic once the app is connected to MQTT
+// Catch ip:set
+ipcRenderer.on('ip:set', function(e,ip){
+  console.log(ip);
+  ipBroker = ip;
+  mqtt_init();
+  mqtt_handler();
+});
+
+// Initialize MQTT Client and subscribe to BED POSITIONING
 function mqtt_init() {
+  client  = mqtt.connect('ws://' + ipBroker + ':9001');
   client.on('connect', function () {
     client.subscribe('fvl/uci/bed/positioning')
   })
 }
 
-//Method to handle incoming message
-function mqtt_handle() {
+// Handle new messages from BED POSITIONING, compare values and update DB
+function mqtt_handler() {
   client.on('message', function (topic, message) {
-    // message is Buffer
-    console.log(message.toString())
     var message_received = message.toString();
     var message_JSON = JSON.parse(message_received);
     var id_message = message_JSON.id;
@@ -48,34 +64,27 @@ function mqtt_handle() {
     var section_message = message_JSON.section;
     var position_message = message_JSON.good_position;
     var d = new Date();
+    var day = d.getUTCDate();
+    var month = d.getUTCMonth() + 1; 
+    var year = d.getUTCFullYear();
     var h = addZero(d.getHours());
     var m = addZero(d.getMinutes());
     var s = addZero(d.getSeconds());
-    
-    
-    function addZero(i) { //Function to add a good format in current_time variable
-      if (i < 10) {
-        i = "0" + i;
-      }
-      return i;
-    }
-
-    var current_time = h + ':' + m + ':' + s;
-  
+    var current_time = day + '/' +  month + '/' + year + '-' + h + ':' + m + ':' + s;
     var key_id = id_message + '-' + current_time;
-    
-
     if (position_message != beds[id_message].good_position) {
       beds[id_message].good_position = position_message;
-      console.log('Posicion actual: ' + beds[id_message].good_position);
       writeBedPositioning(key_id, current_time, id_message, num_message, section_message, position_message);
-
-    } else {
-      console.log(current_time);
     }
-
-    //client.end() -> This disconnect the client not allowing it to receive messagges
   })
+}
+
+//Function to add a good format in current_time variable
+function addZero(i) { 
+  if (i < 10) {
+    i = "0" + i;
+  }
+  return i;
 }
 
 //Method to write on Firebase DB
