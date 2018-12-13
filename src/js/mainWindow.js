@@ -3,6 +3,7 @@ const { remote, ipcRenderer} = electron;
 var mqtt = require('mqtt');
 var ipBroker = '192.168.0.7';
 var client = '';
+const dialog = electron.remote.dialog;
 
 // Initialize Firebase
 var config = {
@@ -40,13 +41,29 @@ mqtt_handler();
 
 // Catch ip:set
 ipcRenderer.on('ip:set', function(e,ip){
-  if(ip!=ipBroker){
-    client.end();
-    ipBroker = ip;
-    mqtt_init();
-    mqtt_handler();
+  let brokerSettingsWindow = remote.getGlobal('brokerSettingsWindow');
+  if(ip != ipBroker){
+      if(isAValidIPaddress(ip)){
+          ipBroker = ip;
+          client.end();
+          mqtt_init();
+          mqtt_handler();
+          brokerSettingsWindow.close(); 
+      }else{
+          dialog.showErrorBox('IP inválida', 'Ingrese una dirección IP válida');
+      }
+      
+  } else{
+      dialog.showErrorBox('IP ya establecida', 'Ingrese una nueva dirección IP');
   }
 });
+
+function isAValidIPaddress(ip) {
+  if (/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ip)){
+      return (true);
+  }
+  return (false)
+}
 
 // Initialize MQTT Client and subscribe to BED POSITIONING
 function mqtt_init() {
