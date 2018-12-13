@@ -83,16 +83,18 @@ function mqtt_handler() {
     var section_message = message_JSON.section;
     var position_message = message_JSON.good_position;
     var d = new Date();
-    var day = d.getUTCDate();
-    var month = d.getUTCMonth() + 1; 
-    var year = d.getUTCFullYear();
+    var day = d.getDate();
+    console.log(day); 
+    var month = d.getMonth() + 1; 
+    var year = d.getFullYear();
     var h = addZero(d.getHours());
     var m = addZero(d.getMinutes());
     var s = addZero(d.getSeconds());
-    var current_time = day + '/' +  month + '/' + year + '-' + h + ':' + m + ':' + s;
+    var current_time = day + '|' +  month + '|' + year + '-' + h + ':' + m + ':' + s;
     var key_id = id_message + '-' + current_time;
     if (position_message != beds[id_message].good_position) {
       beds[id_message].good_position = position_message;
+      console.log('Hol');      
       writeBedPositioning(key_id, current_time, id_message, num_message, section_message, position_message);
     }
   })
