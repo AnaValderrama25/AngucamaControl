@@ -40,17 +40,19 @@ mqtt_handler();
 
 // Catch ip:set
 ipcRenderer.on('ip:set', function(e,ip){
-  console.log(ip);
-  ipBroker = ip;
-  mqtt_init();
-  mqtt_handler();
+  if(ip!=ipBroker){
+    client.end();
+    ipBroker = ip;
+    mqtt_init();
+    mqtt_handler();
+  }
 });
 
 // Initialize MQTT Client and subscribe to BED POSITIONING
 function mqtt_init() {
   client  = mqtt.connect('ws://' + ipBroker + ':9001');
   client.on('connect', function () {
-    client.subscribe('fvl/uci/bed/positioning')
+    client.subscribe('fvl/uci/bed/positioning', {qos: 1})
   })
 }
 
